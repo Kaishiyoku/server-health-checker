@@ -63,7 +63,7 @@ class RunHealthChecks extends Command
             'websites' => $websites,
         ];
 
-        $cache->set('health_checks', $healthChecks);
+        $cache->put('health_checks', $healthChecks);
 
         $this->line(json_encode($healthChecks, JSON_PRETTY_PRINT));
     }
