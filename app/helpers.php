@@ -55,7 +55,13 @@ if (!function_exists('isRedisHealthy')) {
     function isRedisHealthy(): bool
     {
         try {
+            $redisPassword = env('REDIS_PASSWORD');
             $client = new \Predis\Client();
+
+            if ($redisPassword) {
+                $client->auth($redisPassword);
+            }
+
             $client->dbsize();
 
             return true;
