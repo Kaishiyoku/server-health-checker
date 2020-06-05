@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Console\Commands\AddWebsite;
+use App\Console\Commands\RunHealthChecks;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 
@@ -13,7 +15,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        RunHealthChecks::class,
+        AddWebsite::class,
     ];
 
     /**
@@ -24,6 +27,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        //
+        $schedule->command(RunHealthChecks::class)->everyFifteenMinutes();
     }
 }
