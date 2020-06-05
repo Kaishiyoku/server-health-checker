@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         RunHealthChecks::class,
         AddWebsite::class,
+        \Illuminate\Console\KeyGenerateCommand::class,
     ];
 
     /**
