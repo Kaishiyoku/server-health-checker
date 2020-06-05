@@ -57,6 +57,7 @@ class RunHealthChecks extends Command
             }) : null;
 
         $healthChecks = [
+            'check_performed_at' => getCurrentDateAsString(),
             'database' => $isDatabaseHealthy,
             'redis' => $isRedisHealthy,
             'websites' => $websites,
