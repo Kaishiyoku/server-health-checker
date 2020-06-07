@@ -24,8 +24,6 @@ class StatusController extends Controller
 
     public function index()
     {
-        dd(\Illuminate\Support\Str::random(32));
-
         /*** @var CacheRepository $cache */
         $cache = app()->make('cache.store');
 
