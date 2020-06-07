@@ -53,7 +53,7 @@ class RunHealthChecks extends Command
             ->table('websites')
             ->get(['url', 'is_healthy'])
             ->mapWithKeys(function ($website) {
-                return [$website->url => (bool)$website->is_healthy];
+                return [$website->url => isUrlHealthy($website->url)];
             }) : null;
 
         $healthChecks = [
