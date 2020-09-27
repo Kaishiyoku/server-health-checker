@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\AddTeamspeakServer;
 use App\Console\Commands\AddWebsite;
 use App\Console\Commands\RunHealthChecks;
 use Illuminate\Console\Scheduling\Schedule;
@@ -17,6 +18,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         RunHealthChecks::class,
         AddWebsite::class,
+        AddTeamspeakServer::class,
         \Illuminate\Console\KeyGenerateCommand::class,
     ];
 

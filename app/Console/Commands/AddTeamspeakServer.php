@@ -6,23 +6,22 @@ use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Console\Command;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Http;
 
-class AddWebsite extends Command
+class AddTeamspeakServer extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'health-checker:add-website';
+    protected $signature = 'health-checker:add-teamspeak-server';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Add website to be health checked periodically';
+    protected $description = 'Add TeamSpeak server to be health checked periodically';
 
     /**
      * @var DatabaseManager
@@ -51,13 +50,16 @@ class AddWebsite extends Command
         /*** @var CacheRepository $cache */
         $cache = app()->make('cache.store');
 
-        $url = $this->ask('Url');
+        $name = $this->ask('Name');
+        $port = $this->ask('Port');
+        $password = $this->ask('Password');
 
-        $isUrlHealthy = isUrlHealthy($url);
+        $isTeamspeakServerHealthy = isTeamspeakServerHealthy($port, $password);
 
-        $this->db->table('websites')->insert([
-            'url' => $url,
-            'is_healthy' => $isUrlHealthy,
+        $this->db->table('teamspeak_servers')->insert([
+            'name' => $name,
+            'port' => $port,
+            'is_healthy' => $isTeamspeakServerHealthy,
             'created_at' => getCurrentDateAsString(),
             'updated_at' => getCurrentDateAsString(),
         ]);
@@ -66,6 +68,6 @@ class AddWebsite extends Command
 
         Artisan::call(RunHealthChecks::class);
 
-        $this->line('Website added.');
+        $this->line('TeamSpeak server added.');
     }
 }

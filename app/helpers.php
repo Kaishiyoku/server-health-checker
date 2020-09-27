@@ -1,8 +1,10 @@
 <?php
 
 use Carbon\Carbon;
+use GameQ\GameQ;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Predis\Connection\ConnectionException;
 
@@ -18,6 +20,39 @@ if (!function_exists('isUrlHealthy')) {
         } catch (\Exception $e) {
             return false;
         }
+    }
+}
+
+if (!function_exists('isTeamspeakServerHealthy')) {
+    function isTeamspeakServerHealthy(int $port, ?string $password = null): bool
+    {
+        // if the TeamSpeak server has a password we are only able to check if the server is running by opening a TCP socket
+        if ($password) {
+            try {
+                $socket = fsockopen("45.83.107.36", 10011, $errno, $errstr, 2);
+                fclose($socket);
+
+                return true;
+            } catch (\Exception $e) {
+                return false;
+            }
+        }
+
+        $serverAddress = '127.0.0.1:' . $port;
+
+        $gameQ = new GameQ();
+        $gameQ->addServer([
+            'debug' => true,
+            'type' => 'teamspeak3',
+            'host' => $serverAddress,
+            'options' => [
+                'query_port' => 10011,
+            ],
+        ]);
+
+        $data = $gameQ->process()[$serverAddress];
+
+        return Arr::get($data, 'gq_online', false);
     }
 }
 

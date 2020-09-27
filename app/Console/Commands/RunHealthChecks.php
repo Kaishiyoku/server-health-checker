@@ -56,11 +56,19 @@ class RunHealthChecks extends Command
                 return [$website->url => isUrlHealthy($website->url)];
             }) : null;
 
+        $teamspeakServers = $isDatabaseHealthy ? $this->db
+            ->table('teamspeak_servers')
+            ->get(['name', 'port', 'password', 'is_healthy'])
+            ->mapWithKeys(function ($teamspeakServer) {
+                return [$teamspeakServer->name => isTeamspeakServerHealthy($teamspeakServer->port, $teamspeakServer->password)];
+            }) : null;
+
         $healthChecks = [
             'check_performed_at' => getCurrentDateAsString(),
             'database' => $isDatabaseHealthy,
             'redis' => $isRedisHealthy,
             'websites' => $websites,
+            'teamspeak_servers' => $teamspeakServers,
         ];
 
         $cache->put('health_checks', $healthChecks);
