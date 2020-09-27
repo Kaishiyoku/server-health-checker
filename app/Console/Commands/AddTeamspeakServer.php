@@ -59,6 +59,7 @@ class AddTeamspeakServer extends Command
         $this->db->table('teamspeak_servers')->insert([
             'name' => $name,
             'port' => $port,
+            'password' => $password,
             'is_healthy' => $isTeamspeakServerHealthy,
             'created_at' => getCurrentDateAsString(),
             'updated_at' => getCurrentDateAsString(),
