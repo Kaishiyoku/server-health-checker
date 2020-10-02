@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\Setting;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Console\Command;
 use Illuminate\Database\DatabaseManager;
@@ -56,19 +57,20 @@ class RunHealthChecks extends Command
                 return [$website->url => isUrlHealthy($website->url)];
             }) : null;
 
-        $teamspeakServers = $isDatabaseHealthy ? $this->db
-            ->table('teamspeak_servers')
-            ->get(['name', 'port', 'password', 'is_healthy'])
-            ->mapWithKeys(function ($teamspeakServer) {
-                return [$teamspeakServer->name => isTeamspeakServerHealthy($teamspeakServer->port, $teamspeakServer->password)];
-            }) : null;
+        $isTeamspeakServerAvailable = getSettingValue(Setting::TeamSpeakServerAvailable());
+        $teamspeakServerName = getSettingValue(Setting::TeamSpeakServerName());
+        $teamspeakServerPassword = getSettingValue(Setting::TeamSpeakServerPassword());
+
+        $teamspeakServer = $isTeamspeakServerAvailable ? [
+            $teamspeakServerName => isTeamspeakServerHealthy($teamspeakServerPassword),
+        ] : null;
 
         $healthChecks = [
             'check_performed_at' => getCurrentDateAsString(),
             'database' => $isDatabaseHealthy,
             'redis' => $isRedisHealthy,
             'websites' => $websites,
-            'teamspeak_servers' => $teamspeakServers,
+            'teamspeak_server' => $teamspeakServer,
         ];
 
         $cache->put('health_checks', $healthChecks);

@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Database\DatabaseManager;
-use TeamSpeak3;
 
 class StatusController extends Controller
 {

@@ -2,26 +2,27 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\SettingType;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Console\Command;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Facades\Artisan;
 
-class AddTeamspeakServer extends Command
+class AdjustSettings extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'health-checker:add-teamspeak-server';
+    protected $signature = 'health-checker:settings';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Add TeamSpeak server to be health checked periodically';
+    protected $description = 'Adjust health checker settings';
 
     /**
      * @var DatabaseManager
@@ -50,25 +51,26 @@ class AddTeamspeakServer extends Command
         /*** @var CacheRepository $cache */
         $cache = app()->make('cache.store');
 
-        $name = $this->ask('Name');
-        $port = $this->ask('Port');
-        $password = $this->ask('Password');
+        $settings = $this->db->table('settings')->get();
 
-        $isTeamspeakServerHealthy = isTeamspeakServerHealthy($port, $password);
+        $settings->each(function ($setting) {
+            $availableMethods = collect([
+                SettingType::String => function ($setting) { return $this->ask($setting->description, $setting->string_value); },
+                SettingType::Bool => function ($setting) { return $this->confirm($setting->description, $setting->bool_value ?? false); },
+            ]);
 
-        $this->db->table('teamspeak_servers')->insert([
-            'name' => $name,
-            'port' => $port,
-            'password' => $password,
-            'is_healthy' => $isTeamspeakServerHealthy,
-            'created_at' => getCurrentDateAsString(),
-            'updated_at' => getCurrentDateAsString(),
-        ]);
+            $valueField = $setting->type . '_value';
+            $value = $availableMethods->get($setting->type)($setting);
+
+            $this->db->table('settings')->where('key', $setting->key)->update([
+                $valueField => $value,
+            ]);
+        });
 
         $cache->delete('health_checks');
 
         Artisan::call(RunHealthChecks::class);
 
-        $this->line('TeamSpeak server added.');
+        $this->line('Settings updated.');
     }
 }

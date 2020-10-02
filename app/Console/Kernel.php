@@ -2,8 +2,8 @@
 
 namespace App\Console;
 
-use App\Console\Commands\AddTeamspeakServer;
 use App\Console\Commands\AddWebsite;
+use App\Console\Commands\AdjustSettings;
 use App\Console\Commands\RunHealthChecks;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
@@ -18,7 +18,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         RunHealthChecks::class,
         AddWebsite::class,
-        AddTeamspeakServer::class,
+        AdjustSettings::class,
         \Illuminate\Console\KeyGenerateCommand::class,
     ];
 

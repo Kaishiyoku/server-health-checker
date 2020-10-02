@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\SettingType;
 use Carbon\Carbon;
 use GameQ\GameQ;
 use Illuminate\Database\DatabaseManager;
@@ -24,12 +25,12 @@ if (!function_exists('isUrlHealthy')) {
 }
 
 if (!function_exists('isTeamspeakServerHealthy')) {
-    function isTeamspeakServerHealthy(int $port, ?string $password = null): bool
+    function isTeamspeakServerHealthy(?string $password = null): bool
     {
         // if the TeamSpeak server has a password we are only able to check if the server is running by opening a TCP socket
         if ($password) {
             try {
-                $socket = fsockopen("45.83.107.36", 10011, $errno, $errstr, 2);
+                $socket = fsockopen('127.0.0.1', 10011, $errno, $errstr, 2);
                 fclose($socket);
 
                 return true;
@@ -38,7 +39,7 @@ if (!function_exists('isTeamspeakServerHealthy')) {
             }
         }
 
-        $serverAddress = '127.0.0.1:' . $port;
+        $serverAddress = '127.0.0.1:9987';
 
         $gameQ = new GameQ();
         $gameQ->addServer([
@@ -103,5 +104,26 @@ if (!function_exists('isRedisHealthy')) {
         } catch (ConnectionException $e) {
             return false;
         }
+    }
+}
+
+if (!function_exists('getSettingValue')) {
+    function getSettingValue(\App\Enums\Setting $setting)
+    {
+        /*** @var DatabaseManager $db */
+        $db = app('db');
+
+        $dbSetting = $db
+            ->table('settings')
+            ->where('key', $setting->value)
+            ->first();
+
+        $casts = collect([
+            SettingType::Bool => function ($value) { return (bool) $value; },
+        ]);
+
+        $identityFn = function () { return function ($value) { return $value; }; };
+
+        return $casts->get($dbSetting->type, $identityFn)($dbSetting->{$dbSetting->type . '_value'});
     }
 }
