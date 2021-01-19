@@ -8,15 +8,15 @@
         "php": "^7.3",
         "ext-json": "*",
         "austinb/gameq": "^3.0",
-        "bensampo/laravel-enum": "^3.0",
-        "guzzlehttp/guzzle": "^7.0.1",
-        "laravel/lumen-framework": "^8.0",
+        "bensampo/laravel-enum": "^3.2",
+        "guzzlehttp/guzzle": "^7.2",
+        "laravel/lumen-framework": "^8.2",
         "maxsky/lumen-app-key-generator": "^1.0",
         "planetteamspeak/ts3-php-framework": "^1.1",
         "predis/predis": "^1.1"
     },
     "require-dev": {
-        "fzaninotto/faker": "^1.9.1",
+        "fzaninotto/faker": "^1.9.2",
         "mockery/mockery": "^1.4.2",
         "phpunit/phpunit": "^9.3"
     },
