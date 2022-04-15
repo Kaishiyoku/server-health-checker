@@ -121,6 +121,6 @@ if (!function_exists('getSettingValue')) {
 
         $identityFn = function () { return fn($value) => $value; };
 
-        return $casts->get($dbSetting->type, $identityFn)($dbSetting->{$dbSetting->type . '_value'});
+        return $casts->get($dbSetting->type->value, $identityFn)($dbSetting->{$dbSetting->type->value . '_value'});
     }
 }
