@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Enums\Setting;
-use Illuminate\Cache\Repository as CacheRepository;
+use App\Enums\Setting as SettingEnum;
+use App\Models\Website;
 use Illuminate\Console\Command;
-use Illuminate\Database\DatabaseManager;
+use Illuminate\Support\Facades\Cache;
 
 class RunHealthChecks extends Command
 {
@@ -14,7 +14,7 @@ class RunHealthChecks extends Command
      *
      * @var string
      */
-    protected $signature = 'health-checker:run';
+    protected $signature = 'status:run';
 
     /**
      * The console command description.
@@ -23,43 +23,23 @@ class RunHealthChecks extends Command
      */
     protected $description = 'Run server health checks';
 
-    protected $db;
-
-    /**
-     * Create a new command instance.
-     *
-     * @param DatabaseManager $db
-     */
-    public function __construct(DatabaseManager $db)
-    {
-        parent::__construct();
-
-        $this->db = $db;
-    }
-
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return int
      */
     public function handle()
     {
-        /*** @var CacheRepository $cache */
-        $cache = app()->make('cache.store');
-
-        $isDatabaseHealthy = isDatabaseHealthy($this->db);
+        $isDatabaseHealthy = isDatabaseHealthy();
         $isRedisHealthy = isRedisHealthy();
 
-        $websites = $isDatabaseHealthy ? $this->db
-            ->table('websites')
+        $websites = $isDatabaseHealthy ? Website::query()
             ->get(['url', 'is_healthy'])
-            ->mapWithKeys(function ($website) {
-                return [$website->url => isUrlHealthy($website->url)];
-            }) : null;
+            ->mapWithKeys(fn($website) => [$website->url => isUrlHealthy($website->url)]) : null;
 
-        $isTeamspeakServerAvailable = getSettingValue(Setting::TeamSpeakServerAvailable());
-        $teamspeakServerName = getSettingValue(Setting::TeamSpeakServerName());
-        $teamspeakServerPassword = getSettingValue(Setting::TeamSpeakServerPassword());
+        $isTeamspeakServerAvailable = getSettingValue(SettingEnum::TeamSpeakServerAvailable());
+        $teamspeakServerName = getSettingValue(SettingEnum::TeamSpeakServerName());
+        $teamspeakServerPassword = getSettingValue(SettingEnum::TeamSpeakServerPassword());
 
         $teamspeakServer = $isTeamspeakServerAvailable ? [
             $teamspeakServerName => isTeamspeakServerHealthy($teamspeakServerPassword),
@@ -73,8 +53,10 @@ class RunHealthChecks extends Command
             'teamspeak_server' => $teamspeakServer,
         ];
 
-        $cache->put('health_checks', $healthChecks);
+        Cache::put('health_checks', $healthChecks);
 
         $this->line(json_encode($healthChecks, JSON_PRETTY_PRINT));
+
+        return 0;
     }
 }

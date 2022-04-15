@@ -7,7 +7,7 @@ use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
-use Predis\Connection\ConnectionException;
+use Illuminate\Support\Facades\DB;
 
 if (!function_exists('isUrlHealthy')) {
     /**
@@ -69,13 +69,12 @@ if (!function_exists('getCurrentDateAsString')) {
 
 if (!function_exists('isDatabaseHealthy')) {
     /**
-     * @param DatabaseManager $db
      * @return bool
      */
-    function isDatabaseHealthy(DatabaseManager $db): bool
+    function isDatabaseHealthy(): bool
     {
         try {
-            $db->table('websites')->count();
+            DB::table('websites')->count();
 
             return true;
         } catch (QueryException $e) {

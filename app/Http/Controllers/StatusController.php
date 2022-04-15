@@ -2,32 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Cache\Repository as CacheRepository;
-use Illuminate\Database\DatabaseManager;
+use App\Console\Commands\RunHealthChecks;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 
 class StatusController extends Controller
 {
-    protected $db;
-
-    protected $cache;
-
     /**
-     * Create a new controller instance.
+     * Handle the incoming request.
      *
-     * @param DatabaseManager $db
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function __construct(DatabaseManager $db)
+    public function __invoke(Request $request)
     {
-        $this->db = $db;
-    }
+        $cacheValue = Cache::get('health_checks');
 
-    public function index()
-    {
-        /*** @var CacheRepository $cache */
-        $cache = app()->make('cache.store');
+        if (!$cacheValue){
+            Artisan::call(RunHealthChecks::class);
 
-        $health_checks = $cache->get('health_checks');
+            $cacheValue = Cache::get('health_checks');
+        }
 
-        return response()->json($health_checks);
+        return response()->json($cacheValue);
     }
 }

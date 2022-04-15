@@ -3,10 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Enums\SettingType;
-use Illuminate\Cache\Repository as CacheRepository;
+use App\Models\Setting;
 use Illuminate\Console\Command;
-use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 
 class AdjustSettings extends Command
 {
@@ -15,7 +15,7 @@ class AdjustSettings extends Command
      *
      * @var string
      */
-    protected $signature = 'health-checker:settings';
+    protected $signature = 'status:settings';
 
     /**
      * The console command description.
@@ -25,52 +25,34 @@ class AdjustSettings extends Command
     protected $description = 'Adjust health checker settings';
 
     /**
-     * @var DatabaseManager
-     */
-    protected $db;
-
-    /**
-     * Create a new command instance.
-     *
-     * @param DatabaseManager $db
-     */
-    public function __construct(DatabaseManager $db)
-    {
-        parent::__construct();
-
-        $this->db = $db;
-    }
-
-    /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return int
      */
     public function handle()
     {
-        /*** @var CacheRepository $cache */
-        $cache = app()->make('cache.store');
+        $settings = Setting::all();
 
-        $settings = $this->db->table('settings')->get();
-
-        $settings->each(function ($setting) {
+        $settings->each(function (Setting $setting) {
             $availableMethods = collect([
-                SettingType::String => function ($setting) { return $this->ask($setting->description, $setting->string_value); },
-                SettingType::Bool => function ($setting) { return $this->confirm($setting->description, $setting->bool_value ?? false); },
+                SettingType::String => fn(Setting $adjustedSetting) => $this->ask($adjustedSetting->description, $adjustedSetting->string_value),
+                SettingType::Bool => fn(Setting $adjustedSetting) => $this->confirm($adjustedSetting->description, $adjustedSetting->bool_value ?? false),
             ]);
 
-            $valueField = $setting->type . '_value';
-            $value = $availableMethods->get($setting->type)($setting);
+            $valueField = $setting->type->value . '_value';
+            $value = $availableMethods->get($setting->type->value)($setting);
 
-            $this->db->table('settings')->where('key', $setting->key)->update([
+            Setting::whereKey($setting->key->value)->update([
                 $valueField => $value,
             ]);
         });
 
-        $cache->delete('health_checks');
+        Cache::delete('health_checks');
 
         Artisan::call(RunHealthChecks::class);
 
         $this->line('Settings updated.');
+
+        return 0;
     }
 }
