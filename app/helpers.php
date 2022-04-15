@@ -1,13 +1,17 @@
 <?php
 
+use App\Enums\Setting as SettingEnum;
 use App\Enums\SettingType;
+use App\Models\Setting;
 use Carbon\Carbon;
 use GameQ\GameQ;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Predis\Client;
+use Predis\Connection\ConnectionException;
 
 if (!function_exists('isUrlHealthy')) {
     /**
@@ -18,7 +22,7 @@ if (!function_exists('isUrlHealthy')) {
     {
         try {
             return Http::get($url)->ok();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -34,7 +38,7 @@ if (!function_exists('isTeamspeakServerHealthy')) {
                 fclose($socket);
 
                 return true;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return false;
             }
         }
@@ -90,8 +94,8 @@ if (!function_exists('isRedisHealthy')) {
     function isRedisHealthy(): bool
     {
         try {
-            $redisPassword = env('REDIS_PASSWORD');
-            $client = new \Predis\Client();
+            $redisPassword = config('database.redis.default.password');
+            $client = new Client();
 
             if ($redisPassword) {
                 $client->auth($redisPassword);
@@ -107,21 +111,15 @@ if (!function_exists('isRedisHealthy')) {
 }
 
 if (!function_exists('getSettingValue')) {
-    function getSettingValue(\App\Enums\Setting $setting)
+    function getSettingValue(SettingEnum $setting)
     {
-        /*** @var DatabaseManager $db */
-        $db = app('db');
-
-        $dbSetting = $db
-            ->table('settings')
-            ->where('key', $setting->value)
-            ->first();
+        $dbSetting = Setting::firstWhere('key', $setting->value);
 
         $casts = collect([
-            SettingType::Bool => function ($value) { return (bool) $value; },
+            SettingType::Bool => fn($value) => (bool) $value,
         ]);
 
-        $identityFn = function () { return function ($value) { return $value; }; };
+        $identityFn = function () { return fn($value) => $value; };
 
         return $casts->get($dbSetting->type, $identityFn)($dbSetting->{$dbSetting->type . '_value'});
     }
