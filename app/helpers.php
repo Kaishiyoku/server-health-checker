@@ -14,10 +14,6 @@ use Predis\Client;
 use Predis\Connection\ConnectionException;
 
 if (!function_exists('isUrlHealthy')) {
-    /**
-     * @param string $url
-     * @return bool
-     */
     function isUrlHealthy(string $url): bool
     {
         try {
@@ -62,9 +58,6 @@ if (!function_exists('isTeamspeakServerHealthy')) {
 }
 
 if (!function_exists('getCurrentDateAsString')) {
-    /**
-     * @return string
-     */
     function getCurrentDateAsString(): string
     {
         return Carbon::now()->toDateTimeString();
@@ -72,9 +65,6 @@ if (!function_exists('getCurrentDateAsString')) {
 }
 
 if (!function_exists('isDatabaseHealthy')) {
-    /**
-     * @return bool
-     */
     function isDatabaseHealthy(): bool
     {
         try {
@@ -88,9 +78,6 @@ if (!function_exists('isDatabaseHealthy')) {
 }
 
 if (!function_exists('isRedisHealthy')) {
-    /**
-     * @return bool
-     */
     function isRedisHealthy(): bool
     {
         try {
@@ -111,6 +98,10 @@ if (!function_exists('isRedisHealthy')) {
 }
 
 if (!function_exists('getSettingValue')) {
+    /**
+     * @param SettingEnum $setting
+     * @return mixed
+     */
     function getSettingValue(SettingEnum $setting)
     {
         $dbSetting = Setting::firstWhere('key', $setting->value);

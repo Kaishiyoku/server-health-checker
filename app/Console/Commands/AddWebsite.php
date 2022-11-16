@@ -45,6 +45,6 @@ class AddWebsite extends Command
 
         $this->line('Website added.');
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

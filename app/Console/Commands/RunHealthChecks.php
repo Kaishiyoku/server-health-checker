@@ -57,6 +57,6 @@ class RunHealthChecks extends Command
 
         $this->line(json_encode($healthChecks, JSON_PRETTY_PRINT));
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

@@ -53,6 +53,6 @@ class AdjustSettings extends Command
 
         $this->line('Settings updated.');
 
-        return 0;
+        return Command::SUCCESS;
     }
 }
