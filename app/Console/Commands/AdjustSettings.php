@@ -7,6 +7,7 @@ use App\Models\Setting;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
+use function Termwind\{ask};
 
 class AdjustSettings extends Command
 {
@@ -31,9 +32,7 @@ class AdjustSettings extends Command
      */
     public function handle()
     {
-        $settings = Setting::all();
-
-        $settings->each(function (Setting $setting) {
+        Setting::all()->each(function (Setting $setting) {
             $availableMethods = collect([
                 SettingType::String => fn(Setting $adjustedSetting) => $this->ask($adjustedSetting->description, $adjustedSetting->string_value),
                 SettingType::Bool => fn(Setting $adjustedSetting) => $this->confirm($adjustedSetting->description, $adjustedSetting->bool_value ?? false),
@@ -51,7 +50,7 @@ class AdjustSettings extends Command
 
         Artisan::call(RunHealthChecks::class);
 
-        $this->line('Settings updated.');
+        $this->info('Settings updated.');
 
         return Command::SUCCESS;
     }

@@ -43,7 +43,7 @@ class AddWebsite extends Command
 
         Artisan::call(RunHealthChecks::class);
 
-        $this->line('Website added.');
+        $this->info('Website added.');
 
         return Command::SUCCESS;
     }

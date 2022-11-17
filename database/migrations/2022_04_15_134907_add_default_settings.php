@@ -27,14 +27,14 @@ return new class extends Migration
             'key' => SettingEnum::TeamSpeakServerName(),
             'type' => SettingType::String(),
             'string_value' => null,
-            'description' => 'The name of the TeamSpeak server.',
+            'description' => 'The name of the TeamSpeak server',
         ]);
 
         Setting::create([
             'key' => SettingEnum::TeamSpeakServerPassword(),
             'type' => SettingType::String(),
             'string_value' => null,
-            'description' => 'The password of the TeamSpeak Server.',
+            'description' => 'The password of the TeamSpeak Server',
         ]);
     }
 

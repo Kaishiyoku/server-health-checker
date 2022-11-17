@@ -34,11 +34,11 @@ class ListWebsites extends Command
             $healthyClass = $website->is_healthy ? '' : 'text-red-500';
 
             return <<<HTML
-                <div class="flex {$healthyClass}">
+                <div class="flex">
                     <span class="font-bold mr-1">[{$website->id}]</span>
                     <span>{$website->url}­</span>
                     <span class="flex-1 content-repeat-['.']">.</span>
-                    <span class="uppercase">­{$healthyText}</span>
+                    <span class="uppercase {$healthyClass}">­{$healthyText}</span>
                 </div>
             HTML;
         })->join('');
@@ -47,8 +47,7 @@ class ListWebsites extends Command
             <div class="mx-2 my-1">
                 {$websiteHtml}
             </div>
-        HTML
-        );
+        HTML);
 
         return Command::SUCCESS;
     }
