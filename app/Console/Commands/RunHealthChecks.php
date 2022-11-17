@@ -87,10 +87,10 @@ class RunHealthChecks extends Command
             $healthyClass = $isHealthy ? 'text-green-500' : 'text-red-500';
 
             return <<<HTML
-                    <div class="flex {$healthyClass}">
+                    <div class="flex">
                         <span>{$url}­</span>
                         <span class="flex-1 content-repeat-['.']">.</span>
-                        <span class="uppercase">­{$healthyText}</span>
+                        <span class="uppercase {$healthyClass}">­{$healthyText}</span>
                     </div>
                 HTML;
         })->join('');
