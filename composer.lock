@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "87c838f9b5107e102d275bd1fc485a28",
+    "content-hash": "dc36aa7e266f35aed76f4858e2c79f85",
     "packages": [
         {
             "name": "austinb/gameq",

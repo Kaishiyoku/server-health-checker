@@ -12,6 +12,7 @@
         "laravel/framework": "^9.2",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
+        "nunomaduro/termwind": "^1.14",
         "planetteamspeak/ts3-php-framework": "^1.1",
         "predis/predis": "^2.0"
     },
